@@ -11,6 +11,7 @@ import QueenBlack from "../icons/queen-black.svg"
 import QueenWhite from "../icons/queen-white.svg"
 import RookBlack from "../icons/rook-black.svg"
 import RookWhite from "../icons/rook-white.svg"
+import Empty from "../icons/empty.svg"
 
 const IconMap = {
     ["king-black"]: KingBlack,
@@ -25,18 +26,23 @@ const IconMap = {
     ["queen-white"]: QueenWhite,
     ["rook-black"]: RookBlack,
     ["rook-white"]: RookWhite,
+    empty: Empty
 }
 
+export type ChessIconType = keyof typeof IconMap
+
 interface IconProps {
-    iconType: keyof typeof IconMap
+    iconType: ChessIconType,
+    className?: string
 }
 
 export const Icon: React.FC<IconProps> = ({
-    iconType
+    iconType,
+    className
 }) => {
     return (
-        <div>
-            <img src={IconMap[iconType]} />
+        <div className={className}>
+            <img width={"70%"} height={"70%"} src={IconMap[iconType]} />
         </div>
     )
 }

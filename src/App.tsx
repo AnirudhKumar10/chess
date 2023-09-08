@@ -1,14 +1,13 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import { Icon } from './components/Icon';
+import React from "react";
+import logo from "./logo.svg";
+import "./App.css";
+import { Icon } from "./components/Icon";
+import Board from "./components/Board";
 
 function App() {
   return (
     <div className="App">
-      <Icon iconType="bishop-black" />
-      <Icon iconType="bishop-white" />
-      <Icon iconType="knight-black" />
+      <Board />
     </div>
   );
 }
