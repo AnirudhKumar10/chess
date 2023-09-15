@@ -3,10 +3,11 @@ import { ChessIconType, Icon } from "./Icon";
 import { useAppDispatch, useAppSelector } from "../store/hook";
 import { move, setActivePos } from "../store/slice/boardSlice";
 import {
-  validateDiagonal,
-  validateLShape,
+  getDiagonalMove,
+  getFileMove,
+  getLshapemove,
+  getRankMove,
   validateMove,
-  validateStraightLine,
 } from "../utils/valid-moves";
 
 interface BoxProp {
@@ -24,8 +25,12 @@ export const Box: React.FC<BoxProp> = ({ color, chessIcon, id }: BoxProp) => {
     console.log(e);
     e.preventDefault();
     e.stopPropagation();
-    console.log(validateMove(activePiece.chessIcon || "", activePiece.pos, id as string))
-    if (validateMove(activePiece.chessIcon || "", activePiece.pos, id as string)) {
+    console.log(
+      validateMove(activePiece.chessIcon || "", activePiece.pos, id as string)
+    );
+    if (
+      validateMove(activePiece.chessIcon || "", activePiece.pos, id as string)
+    ) {
       dispatch(
         move({
           chessIcon: activePiece.chessIcon,
@@ -52,9 +57,13 @@ export const Box: React.FC<BoxProp> = ({ color, chessIcon, id }: BoxProp) => {
     console.log(e);
     e.preventDefault();
     e.stopPropagation();
-    console.log(validateStraightLine(id as string, "a4"), "ANIRUDH");
-    console.log(validateDiagonal(id as string, "a4"), "ANIRUDH");
-    console.log(validateLShape(id as string, "e4"), "ANIRUDH");
+    dispatch(setActivePos({ pos: id, chessIcon }));
+
+    getFileMove(id as string, 1, 2);
+    getRankMove(id as string, 1, 2, 3);
+    getDiagonalMove(id as string, 1, 2, 3);
+
+    getLshapemove(id as string);
   };
 
   return (

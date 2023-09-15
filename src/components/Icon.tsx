@@ -11,6 +11,7 @@ import QueenBlack from "../icons/queen-black.svg";
 import QueenWhite from "../icons/queen-white.svg";
 import RookBlack from "../icons/rook-black.svg";
 import RookWhite from "../icons/rook-white.svg";
+import WhiteDot from "../icons/white-dot.svg"
 
 const IconMap = {
   "king-black": KingBlack,
@@ -24,7 +25,8 @@ const IconMap = {
   "queen-black": QueenBlack,
   "queen-white": QueenWhite,
   "rook-black": RookBlack,
-  "rook-white": RookWhite
+  "rook-white": RookWhite,
+  "white-dot": WhiteDot
 };
 
 export type ChessIconType = keyof typeof IconMap | undefined;
