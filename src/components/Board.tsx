@@ -1,12 +1,11 @@
-import React from "react";
 import { Box } from "./Box";
-import { intitalChess } from "../utils/intial-state";
-import { ChessIconType } from "./Icon";
+import { useAppSelector } from "../store/hook";
 
 const Rank = [1, 2, 3, 4, 5, 6, 7, 8];
 const File = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
 function Board() {
+  const boardState = useAppSelector(state => state.board)
   return (
     <div className="board-size">
       <div className={"board"}>
@@ -15,7 +14,7 @@ function Board() {
             <Box
               key={`${file}${rank}`}
               id={`${file}${9-rank}`}
-              chessIcon={intitalChess[`${file}${9-rank}`]}
+              chessIcon={boardState.board[`${file}${9-rank}`]}
               color={(fileIndex + rank) % 2 === 0 ? "black" : "white"}
             />
           ))

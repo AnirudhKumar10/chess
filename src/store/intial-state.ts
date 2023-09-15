@@ -1,10 +1,10 @@
 import { ChessIconType } from "../components/Icon"
 
-interface BoardType {
+export interface BoardType {
     [key: string]: ChessIconType
 }
 
-export const intitalChess: BoardType = {
+export const intitalBoardChess: BoardType = {
     a1: "rook-white",
     b1: "knight-white",
     c1: "bishop-white",
@@ -22,42 +22,6 @@ export const intitalChess: BoardType = {
     f2: "pawn-white",
     g2: "pawn-white",
     h2: "pawn-white",
-
-    a3: "empty",
-    b3: "empty",
-    c3: "empty",
-    d3: "empty",
-    e3: "empty",
-    f3: "empty",
-    g3: "empty",
-    h3: "empty",
-
-    a4: "empty",
-    b4: "empty",
-    c4: "empty",
-    d4: "empty",
-    e4: "empty",
-    f4: "empty",
-    g4: "empty",
-    h4: "empty",
-
-    a5: "empty",
-    b5: "empty",
-    c5: "empty",
-    d5: "empty",
-    e5: "empty",
-    f5: "empty",
-    g5: "empty",
-    h5: "empty",
-
-    a6: "empty",
-    b6: "empty",
-    c6: "empty",
-    d6: "empty",
-    e6: "empty",
-    f6: "empty",
-    g6: "empty",
-    h6: "empty",
 
     // black pawn
     a7: "pawn-black",
