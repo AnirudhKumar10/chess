@@ -11,9 +11,9 @@ import QueenBlack from "../icons/queen-black.svg";
 import QueenWhite from "../icons/queen-white.svg";
 import RookBlack from "../icons/rook-black.svg";
 import RookWhite from "../icons/rook-white.svg";
-import WhiteDot from "../icons/white-dot.svg"
+import { Piece } from "../utils/types";
 
-const IconMap = {
+export const IconMap = {
   "king-black": KingBlack,
   "king-white": KingWhite,
   "bishop-black": BishopBlack,
@@ -26,25 +26,44 @@ const IconMap = {
   "queen-white": QueenWhite,
   "rook-black": RookBlack,
   "rook-white": RookWhite,
-  "white-dot": WhiteDot
 };
 
-export type ChessIconType = keyof typeof IconMap | undefined;
+export const ColorMap = {
+  B: "black",
+  W: "white",
+};
+
+export const PieceMap = {
+  p: "pawn",
+  K: "king",
+  Q: "queen",
+  N: "knight",
+  B: "bishop",
+  R: "rook",
+};
 
 interface IconProps {
-  iconType?: ChessIconType;
+  iconType: Piece | undefined;
   className?: string;
-  id?: string
+  id?: string;
 }
 
-export const Icon: React.FC<IconProps> = ({
-  iconType,
-  className,
-  id
-}) => {
+export const Icon: React.FC<IconProps> = ({ iconType, className, id }) => {
   return (
     <div id={id} draggable className={className}>
-      {iconType && <img width={"75%"} height={"75%"} src={IconMap[iconType]} />}
+      {iconType && (
+        <img
+          width={"75%"}
+          height={"75%"}
+          src={
+            IconMap[
+              `${PieceMap[iconType.type]}-${
+                ColorMap[iconType.color]
+              }` as keyof typeof IconMap
+            ]
+          }
+        />
+      )}
     </div>
   );
 };

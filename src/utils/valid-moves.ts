@@ -1,5 +1,18 @@
-import { store } from "../store";
-import { chessSquare } from "./types";
+// import { store } from "../store";
+// import { chessSquare } from "./types";
+
+import { PieceMap } from "../components/Icon";
+import { Piece, chessSquare, square } from "./types";
+
+export const validMoveSize: { [key: string]: number[] } = {
+  "pawn-white": [1],
+  "pawn-black": [-1],
+  king: [1, -1],
+  queen: [1, 2, 3, 4, 5, 6, 7, -1, -2, -3, -4, -5, -6, -7],
+  bishop: [1, 2, 3, 4, 5, 6, 7, -1, -2, -3, -4, -5, -6, -7],
+  rook: [1, 2, 3, 4, 5, 6, 7, -1, -2, -3, -4, -5, -6, -7],
+  knight: [],
+};
 
 const File: { [key: string]: number } = {
   a: 1,
@@ -12,114 +25,36 @@ const File: { [key: string]: number } = {
   h: 8,
 };
 
-export const validateStraightLine = (intPos: string, finalPos: string) => {
-  const [intFile, intRank] = intPos.split("");
-  const [finalFile, finalRank] = finalPos.split("");
-  return {
-    isSameFile: intFile === finalFile,
-    isSameRank: intRank === finalRank,
-    moveSize:
-      intFile !== finalFile
-        ? File[intFile] - File[finalFile]
-        : Number(intRank) - Number(finalRank),
-    valid: intFile === finalFile || intRank === finalRank,
-  };
-};
-
-export const validateDiagonal = (intPos: string, finalPos: string) => {
-  const [intFile, intRank] = intPos.split("");
-  const [finalFile, finalRank] = finalPos.split("");
+export const validateStraightLine = (
+  from: square,
+  to: square,
+  moveSize: number[]
+) => {
   return {
     valid:
-      Math.abs((intRank as any) - Number(finalRank)) ===
-      Math.abs(File[intFile] - File[finalFile]),
-    moveSize: Math.abs(File[intFile] - File[finalFile]),
+      getFileMove(from, ...moveSize).includes(to) ||
+      getRankMove(from, ...moveSize).includes(to),
+    isSameFile: getFileMove(from, ...moveSize).includes(to),
   };
 };
 
-export const validateLShape = (intPos: string, finalPos: string) => {
-  const [intFile, intRank] = intPos.split("");
-  const [finalFile, finalRank] = finalPos.split("");
-
-  const a =
-    Number(intRank) + 2 === Number(finalRank) &&
-    File[intFile] + 1 === File[finalFile];
-  const b =
-    Number(intRank) + 2 === Number(finalRank) &&
-    File[intFile] - 1 === File[finalFile];
-  const c =
-    Number(intRank) - 2 === Number(finalRank) &&
-    File[intFile] + 1 === File[finalFile];
-  const d =
-    Number(intRank) - 2 === Number(finalRank) &&
-    File[intFile] - 1 === File[finalFile];
-  const e =
-    Number(intRank) + 1 === Number(finalRank) &&
-    File[intFile] + 2 === File[finalFile];
-  const f =
-    Number(intRank) + 1 === Number(finalRank) &&
-    File[intFile] - 2 === File[finalFile];
-  const g =
-    Number(intRank) - 1 === Number(finalRank) &&
-    File[intFile] + 2 === File[finalFile];
-  const h =
-    Number(intRank) - 1 === Number(finalRank) &&
-    File[intFile] - 2 === File[finalFile];
-
-  return {
-    valid: a || b || c || d || e || f || g || h,
-  };
-};
-
-export const validateMove = (
-  chessIcon: string,
-  intPos: string,
-  finalPos: string
+export const validateDiagonal = (
+  intPos: square,
+  finalPos: square,
+  moveSize: number[]
 ) => {
-  const chessKey = `${chessIcon.split("-")[0]}${
-    chessIcon.split("-")[0] !== "pawn" ? "" : "-" + chessIcon.split("-")[1]
-  }`;
-  const straightMove = validateStraightLine(intPos, finalPos);
-  const diagonalMove = validateDiagonal(intPos, finalPos);
-  const lShapeMove = validateLShape(intPos, finalPos);
-
-  if (
-    chessIcon.split("-")[1] ===
-    store.getState().board.board[finalPos]?.split("-")[1]
-  ) {
-    return false;
-  }
-
-  switch (chessKey) {
-    case "pawn-white":
-      return (
-        straightMove.moveSize === -1 &&
-        straightMove.valid &&
-        straightMove.isSameFile
-      );
-    case "pawn-black":
-      return (
-        straightMove.moveSize === 1 &&
-        straightMove.valid &&
-        straightMove.isSameFile
-      );
-    case "king":
-      return (
-        (straightMove.valid && Math.abs(straightMove.moveSize) === 1) ||
-        (diagonalMove.valid && Math.abs(diagonalMove.moveSize) === 1)
-      );
-    case "queen":
-      return straightMove.valid || diagonalMove.valid;
-    case "knight":
-      return lShapeMove.valid;
-    case "bishop":
-      return diagonalMove.valid;
-    case "rook":
-      return straightMove.valid;
-  }
+  return {
+    valid: getDiagonalMove(intPos, ...moveSize).includes(finalPos),
+  };
 };
 
-export const getDiagonalMove = (pos: string, ...moveSize: number[]) => {
+export const validateLShape = (intPos: square, finalPos: square) => {
+  return {
+    valid: getLshapemove(intPos).includes(finalPos),
+  };
+};
+
+export const getDiagonalMove = (pos: square, ...moveSize: number[]) => {
   const [intFile, intRank] = pos.split("");
 
   return moveSize.reduce((acc, move) => {
@@ -185,4 +120,68 @@ export const getLshapemove = (pos: string) => {
   });
 };
 
-export const getValidMoves = (chessIcon: string, pos: string) => {};
+export const validateMove = (chessIcon: Piece, from: square, to: square) => {
+  const chessKey = `${PieceMap[chessIcon.type]}-${
+    chessIcon.type === "p" ? (chessIcon.color === "B" ? "black" : "white") : ""
+  }`;
+
+  const moveSize = validMoveSize[chessKey];
+  const straightMove = validateStraightLine(from, to, moveSize);
+  const diagonalMove = validateDiagonal(from, to, moveSize);
+  const lShapeMove = validateLShape(from, to);
+
+  switch (chessKey) {
+    case "pawn-white":
+      return straightMove.valid && straightMove.isSameFile;
+    case "pawn-black":
+      return straightMove.valid && straightMove.isSameFile;
+    case "king":
+      return straightMove.valid || diagonalMove.valid;
+    case "queen":
+      return straightMove.valid || diagonalMove.valid;
+    case "knight":
+      return lShapeMove.valid;
+    case "bishop":
+      return diagonalMove.valid;
+    case "rook":
+      return straightMove.valid;
+  }
+};
+
+export const getValidMoveArray = (chessIcon: Piece, pos: square) => {
+  const chessKey = `${PieceMap[chessIcon.type]}${
+    chessIcon.type === "p" ? (chessIcon.color === "B" ? "-black" : "-white") : ""
+  }`;
+
+  const moveSize = validMoveSize[chessKey];
+
+  switch (chessKey) {
+    case "pawn-white":
+      return [...getFileMove(pos, ...moveSize)];
+    case "pawn-black":
+      return [...getFileMove(pos, ...moveSize)];
+    case "king":
+      return [
+        ...getDiagonalMove(pos, ...moveSize),
+        ...getFileMove(pos, ...moveSize),
+        ...getRankMove(pos, ...moveSize),
+      ];
+    case "queen":
+      return [
+        ...getDiagonalMove(pos, ...moveSize),
+        ...getRankMove(pos, ...moveSize),
+        ...getFileMove(pos, ...moveSize),
+      ];
+    case "knight":
+      return [...getLshapemove(pos)];
+    case "bishop":
+      return [...getDiagonalMove(pos, ...moveSize)];
+    case "rook":
+      return [
+        ...getFileMove(pos, ...moveSize),
+        ...getRankMove(pos, ...moveSize),
+      ];
+    default:
+      return [];
+  }
+};

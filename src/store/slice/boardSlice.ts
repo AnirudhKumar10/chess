@@ -1,40 +1,45 @@
-import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import { BoardType, intitalBoardChess } from "../intial-state";
-import { ChessIconType } from "../../components/Icon";
-
-interface MoveAction {
-  chessIcon: ChessIconType;
-  initialPos: string;
-  finalPos: string;
-}
+import { Draft, PayloadAction, createSlice } from "@reduxjs/toolkit";
+import { intitalBoardChess } from "../intial-state";
+import {
+  ActivePiece,
+  ChessBoardState,
+  Move,
+  Validation,
+  square,
+} from "../../utils/types";
 
 export const boardSlice = createSlice({
   name: "counter",
   initialState: {
     board: intitalBoardChess,
+    validation: {},
     activePiece: {
-      pos: "",
-      chessIcon: undefined
+      piece: {},
+      from: "" as square,
     },
-  },
+  } as ChessBoardState,
   reducers: {
-    move: (state, action: PayloadAction<MoveAction>) => {
-      // validate move
-      // update state
-      console.log(action.payload)
+    move: (state, action: PayloadAction<Move>) => {
       state.board = {
         ...state.board,
-        [action.payload.initialPos]: undefined,
-        [action.payload.finalPos]: action.payload.chessIcon,
+        [action.payload.from]: undefined,
+        [action.payload.to]: action.payload.piece,
       };
     },
-    setActivePos: (state, action: PayloadAction<any>) => {
-      state.activePiece.pos = action.payload.pos
-      state.activePiece.chessIcon = action.payload.chessIcon
+    activePiece: (state, action: PayloadAction<ActivePiece>) => {
+      state.activePiece = {
+        from: action.payload.from,
+        piece: action.payload.piece,
+      };
+    },
+    validationSquare: (state, action: PayloadAction<Validation>) => {
+      state.validation = {
+        ...action.payload,
+      };
     },
   },
 });
 
-export const { move, setActivePos } = boardSlice.actions;
+export const { move, activePiece, validationSquare } = boardSlice.actions;
 
 export default boardSlice.reducer;

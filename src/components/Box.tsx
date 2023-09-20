@@ -1,43 +1,32 @@
 import React, { useRef, DragEventHandler, MouseEventHandler } from "react";
-import { ChessIconType, Icon } from "./Icon";
+import { Icon } from "./Icon";
 import { useAppDispatch, useAppSelector } from "../store/hook";
-import { move, setActivePos } from "../store/slice/boardSlice";
-import {
-  getDiagonalMove,
-  getFileMove,
-  getLshapemove,
-  getRankMove,
-  validateMove,
-} from "../utils/valid-moves";
+import { move, activePiece, validationSquare } from "../store/slice/boardSlice";
+import { Board, Piece, square } from "../utils/types";
+import { getValidMoveArray } from "../utils/valid-moves";
 
 interface BoxProp {
   color: "white" | "black";
-  chessIcon: ChessIconType;
-  id?: string;
+  chessIcon: Piece;
+  id?: square;
+  applyValidationStyle?: boolean;
 }
 
-export const Box: React.FC<BoxProp> = ({ color, chessIcon, id }: BoxProp) => {
+export const Box: React.FC<BoxProp> = ({
+  color,
+  chessIcon,
+  id,
+  applyValidationStyle,
+}: BoxProp) => {
   const imgRef = useRef<HTMLImageElement>(null);
   const dispatch = useAppDispatch();
-  const activePiece = useAppSelector((state) => state.board.activePiece);
+  const ap = useAppSelector((state) => state.board.activePiece);
 
   const handleDrop: DragEventHandler<HTMLDivElement> = (e) => {
-    console.log(e);
     e.preventDefault();
     e.stopPropagation();
-    console.log(
-      validateMove(activePiece.chessIcon || "", activePiece.pos, id as string)
-    );
-    if (
-      validateMove(activePiece.chessIcon || "", activePiece.pos, id as string)
-    ) {
-      dispatch(
-        move({
-          chessIcon: activePiece.chessIcon,
-          initialPos: activePiece.pos,
-          finalPos: id as string,
-        })
-      );
+    if (applyValidationStyle) {
+      dispatch(move({ ...ap, to: id as square }));
     }
   };
 
@@ -49,21 +38,28 @@ export const Box: React.FC<BoxProp> = ({ color, chessIcon, id }: BoxProp) => {
   const handleDrag: DragEventHandler<HTMLDivElement> = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log(id);
-    dispatch(setActivePos({ pos: id, chessIcon }));
+    dispatch(activePiece({ piece: chessIcon, from: id as square }));
   };
 
   const handleclick: MouseEventHandler<HTMLDivElement> = (e: any) => {
-    console.log(e);
+    // console.log(e);
     e.preventDefault();
     e.stopPropagation();
-    dispatch(setActivePos({ pos: id, chessIcon }));
+    dispatch(activePiece({ piece: chessIcon, from: id as square }));
 
-    getFileMove(id as string, 1, 2);
-    getRankMove(id as string, 1, 2, 3);
-    getDiagonalMove(id as string, 1, 2, 3);
+    if (applyValidationStyle) {
+      dispatch(move({ ...ap, to: id as square }));
+      dispatch(validationSquare({}));
+    }
 
-    getLshapemove(id as string);
+    if (!ap.from) {
+      const validMoveObject = getValidMoveArray(
+        chessIcon || ap.piece,
+        id as square
+      )?.reduce((acc, key) => ({ ...acc, [key]: true }), {} as Board);
+
+      dispatch(validationSquare(validMoveObject));
+    }
   };
 
   return (
@@ -76,6 +72,7 @@ export const Box: React.FC<BoxProp> = ({ color, chessIcon, id }: BoxProp) => {
       className={`${color} box`}
     >
       <Icon id={id} className="size-50" iconType={chessIcon} />
+      {applyValidationStyle && <div className="validation-circle"></div>}
     </div>
   );
 };
